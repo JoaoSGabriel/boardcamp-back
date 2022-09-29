@@ -1,14 +1,21 @@
+import connection from "../db.js";
+
 export async function list(req, res) {
   try {
-    res.send("rota de listar categories");
+    const list = await connection.query("SELECT * FROM categories;");
+    res.send(list.rows);
   } catch (error) {
     return res.status(500).send(error.message);
   }
 }
 
 export async function create(req, res) {
+  const categorie = req.body;
   try {
-    res.send("rota de criar categories");
+    await connection.query("INSERT INTO categories (nome) VALUES $1;", [
+      categorie,
+    ]);
+    res.sendStatus(201);
   } catch (error) {
     return res.status(500).send(error.message);
   }
