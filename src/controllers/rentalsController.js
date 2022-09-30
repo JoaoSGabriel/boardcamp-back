@@ -2,11 +2,83 @@ import dayjs from "dayjs";
 import connection from "../db.js";
 
 export async function list(req, res) {
+  const filterCustomerId = req.query.customerId;
+  const filterGameId = req.query.gameId;
+
   try {
-    const list = await connection.query(
-      `SELECT rentals.*, customers.id AS "IDConsumidor", customers.name, games.id, games.name AS "gameName", games."categoryId", categories.name AS "categoryName" FROM rentals JOIN customers ON rentals."customerId" = customers.id JOIN games ON rentals."gameId" = games.id JOIN categories ON games."categoryId" = categories.id;`
-    );
-    res.send(list.rows);
+    if (req.query.customerId) {
+      const listRentals = await connection.query(
+        `SELECT * FROM rentals WHERE "customerId" = $1;`,
+        [filterCustomerId]
+      );
+
+      for (let i = 0; i < listRentals.rows.length; i++) {
+        const customer = await connection.query(
+          "SELECT id, name FROM customers WHERE id = $1",
+          [listRentals.rows[i].customerId]
+        );
+
+        const game = await connection.query(
+          `SELECT games.id, games.name, games."categoryId", categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id WHERE games.id = $1;`,
+          [listRentals.rows[i].gameId]
+        );
+
+        listRentals.rows[i] = {
+          ...listRentals.rows[i],
+          customer: customer.rows[0],
+          game: game.rows[0],
+        };
+      }
+
+      return res.send(listRentals.rows);
+    } else if (req.query.gameId) {
+      const listRentals = await connection.query(
+        `SELECT * FROM rentals WHERE "gameId" = $1;`,
+        [filterGameId]
+      );
+
+      for (let i = 0; i < listRentals.rows.length; i++) {
+        const customer = await connection.query(
+          "SELECT id, name FROM customers WHERE id = $1",
+          [listRentals.rows[i].customerId]
+        );
+
+        const game = await connection.query(
+          `SELECT games.id, games.name, games."categoryId", categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id WHERE games.id = $1;`,
+          [listRentals.rows[i].gameId]
+        );
+
+        listRentals.rows[i] = {
+          ...listRentals.rows[i],
+          customer: customer.rows[0],
+          game: game.rows[0],
+        };
+      }
+
+      return res.send(listRentals.rows);
+    } else {
+      const listRentals = await connection.query(`SELECT * FROM rentals;`);
+
+      for (let i = 0; i < listRentals.rows.length; i++) {
+        const customer = await connection.query(
+          "SELECT id, name FROM customers WHERE id = $1",
+          [listRentals.rows[i].customerId]
+        );
+
+        const game = await connection.query(
+          `SELECT games.id, games.name, games."categoryId", categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id WHERE games.id = $1;`,
+          [listRentals.rows[i].gameId]
+        );
+
+        listRentals.rows[i] = {
+          ...listRentals.rows[i],
+          customer: customer.rows[0],
+          game: game.rows[0],
+        };
+      }
+
+      return res.send(listRentals.rows);
+    }
   } catch (error) {
     return res.status(500).send(error.message);
   }
