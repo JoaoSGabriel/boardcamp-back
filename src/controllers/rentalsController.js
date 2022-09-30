@@ -107,7 +107,7 @@ export async function rent(req, res) {
     const rent = {
       customerId: req.body.customerId,
       gameId: req.body.gameId,
-      rentDate: dayjs().format("MM-DD-YYYY"),
+      rentDate: dayjs().format("YYYY-MM-DD"),
       daysRented: req.body.daysRented,
       returnDate: null,
       originalPrice: req.body.daysRented * game.rows[0].pricePerDay,

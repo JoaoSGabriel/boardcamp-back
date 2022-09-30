@@ -21,15 +21,15 @@ export async function list(req, res) {
 }
 
 export async function getByID(req, res) {
-  const cpf = req.params.id;
+  const id = req.params.id;
 
   try {
     const client = await connection.query(
-      "SELECT * FROM customers WHERE cpf = $1",
-      [cpf]
+      "SELECT * FROM customers WHERE id = $1",
+      [id]
     );
     if (client.rows.length === 0) return res.sendStatus(404);
-    res.send(client.rows);
+    res.send(client.rows[0]);
   } catch (error) {
     return res.status(500).send(error.message);
   }
@@ -50,7 +50,7 @@ export async function updateCustomer(req, res) {
       "SELECT * FROM customers WHERE cpf = $1",
       [req.body.cpf]
     );
-    if (sameCPF.rows.length >= 1 && client.rows[0].cpf !== sameCPF.rows.cpf) {
+    if (sameCPF.rows.length >= 1 && client.rows[0].cpf !== req.body.cpf) {
       return res.sendStatus(409);
     } else {
       await connection.query(

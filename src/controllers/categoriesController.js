@@ -11,7 +11,6 @@ export async function list(req, res) {
 
 export async function create(req, res) {
   const categorie = req.body.name;
-  console.log(categorie);
 
   if (!categorie) return res.sendStatus(400);
 
