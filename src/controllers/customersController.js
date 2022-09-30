@@ -43,10 +43,14 @@ export async function updateCustomer(req, res) {
 
   try {
     const client = await connection.query(
+      "SELECT * FROM customers WHERE id = $1",
+      [id]
+    );
+    const sameCPF = await connection.query(
       "SELECT * FROM customers WHERE cpf = $1",
       [req.body.cpf]
     );
-    if (client.rows.length !== 0) {
+    if (sameCPF.rows.length >= 1 && client.rows[0].cpf !== sameCPF.rows.cpf) {
       return res.sendStatus(409);
     } else {
       await connection.query(
