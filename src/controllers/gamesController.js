@@ -2,10 +2,10 @@ import connection from "../db.js";
 import { postGamesSchema } from "../schemas/schemas.js";
 
 export async function list(req, res) {
-  const filter = req.query.name;
+  const filter = req.query.name + "%";
 
   try {
-    if (filter) {
+    if (req.query.name) {
       const filterList = await connection.query(
         "SELECT * FROM games WHERE name LIKE ($1)",
         [filter]
