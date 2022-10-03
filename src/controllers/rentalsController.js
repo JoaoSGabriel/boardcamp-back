@@ -6,77 +6,95 @@ export async function list(req, res) {
   const filterGameId = req.query.gameId;
 
   try {
+    const listRentals = await connection.query(
+      `SELECT rentals.*, customers.id AS "customersID", customers.name, games.id AS "gameID", games.name AS "gameName", games."categoryId", categories.name AS "categoryName" FROM rentals join customers ON rentals."customerId" = customers.id JOIN games ON rentals."gameId" = games.id JOIN categories ON games."categoryId" = categories.id`
+    );
+
     if (req.query.customerId) {
       const listRentals = await connection.query(
-        `SELECT * FROM rentals WHERE "customerId" = $1;`,
+        `SELECT rentals.*, customers.id AS "customersID", customers.name, games.id AS "gameID", games.name AS "gameName", games."categoryId", categories.name AS "categoryName" FROM rentals join customers ON rentals."customerId" = customers.id JOIN games ON rentals."gameId" = games.id JOIN categories ON games."categoryId" = categories.id WHERE rentals."customerId" = $1;`,
         [filterCustomerId]
       );
 
       for (let i = 0; i < listRentals.rows.length; i++) {
-        const customer = await connection.query(
-          "SELECT id, name FROM customers WHERE id = $1",
-          [listRentals.rows[i].customerId]
-        );
-
-        const game = await connection.query(
-          `SELECT games.id, games.name, games."categoryId", categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id WHERE games.id = $1;`,
-          [listRentals.rows[i].gameId]
-        );
-
         listRentals.rows[i] = {
-          ...listRentals.rows[i],
-          customer: customer.rows[0],
-          game: game.rows[0],
+          id: listRentals.rows[i].id,
+          customerId: listRentals.rows[i].customerId,
+          gameId: listRentals.rows[i].gameId,
+          rentDate: listRentals.rows[i].rentDate,
+          daysRented: listRentals.rows[i].daysRented,
+          returnDate: listRentals.rows[i].returnDate,
+          originalPrice: listRentals.rows[i].originalPrice,
+          delayFee: listRentals.rows[i].delayFee,
+          customer: {
+            id: listRentals.rows[i].customersID,
+            name: listRentals.rows[i].name,
+          },
+          game: {
+            id: listRentals.rows[i].gameID,
+            name: listRentals.rows[i].gameName,
+            categoryId: listRentals.rows[i].categoryId,
+            categoryName: listRentals.rows[i].categoryName,
+          },
         };
       }
-
       return res.send(listRentals.rows);
     } else if (req.query.gameId) {
       const listRentals = await connection.query(
-        `SELECT * FROM rentals WHERE "gameId" = $1;`,
+        `SELECT rentals.*, customers.id AS "customersID", customers.name, games.id AS "gameID", games.name AS "gameName", games."categoryId", categories.name AS "categoryName" FROM rentals join customers ON rentals."customerId" = customers.id JOIN games ON rentals."gameId" = games.id JOIN categories ON games."categoryId" = categories.id WHERE rentals."gameId" = $1;`,
         [filterGameId]
       );
 
       for (let i = 0; i < listRentals.rows.length; i++) {
-        const customer = await connection.query(
-          "SELECT id, name FROM customers WHERE id = $1",
-          [listRentals.rows[i].customerId]
-        );
-
-        const game = await connection.query(
-          `SELECT games.id, games.name, games."categoryId", categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id WHERE games.id = $1;`,
-          [listRentals.rows[i].gameId]
-        );
-
         listRentals.rows[i] = {
-          ...listRentals.rows[i],
-          customer: customer.rows[0],
-          game: game.rows[0],
+          id: listRentals.rows[i].id,
+          customerId: listRentals.rows[i].customerId,
+          gameId: listRentals.rows[i].gameId,
+          rentDate: listRentals.rows[i].rentDate,
+          daysRented: listRentals.rows[i].daysRented,
+          returnDate: listRentals.rows[i].returnDate,
+          originalPrice: listRentals.rows[i].originalPrice,
+          delayFee: listRentals.rows[i].delayFee,
+          customer: {
+            id: listRentals.rows[i].customersID,
+            name: listRentals.rows[i].name,
+          },
+          game: {
+            id: listRentals.rows[i].gameID,
+            name: listRentals.rows[i].gameName,
+            categoryId: listRentals.rows[i].categoryId,
+            categoryName: listRentals.rows[i].categoryName,
+          },
         };
       }
-
       return res.send(listRentals.rows);
     } else {
-      const listRentals = await connection.query(`SELECT * FROM rentals;`);
+      const listRentals = await connection.query(
+        `SELECT rentals.*, customers.id AS "customersID", customers.name, games.id AS "gameID", games.name AS "gameName", games."categoryId", categories.name AS "categoryName" FROM rentals join customers ON rentals."customerId" = customers.id JOIN games ON rentals."gameId" = games.id JOIN categories ON games."categoryId" = categories.id;`
+      );
 
       for (let i = 0; i < listRentals.rows.length; i++) {
-        const customer = await connection.query(
-          "SELECT id, name FROM customers WHERE id = $1",
-          [listRentals.rows[i].customerId]
-        );
-
-        const game = await connection.query(
-          `SELECT games.id, games.name, games."categoryId", categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id WHERE games.id = $1;`,
-          [listRentals.rows[i].gameId]
-        );
-
         listRentals.rows[i] = {
-          ...listRentals.rows[i],
-          customer: customer.rows[0],
-          game: game.rows[0],
+          id: listRentals.rows[i].id,
+          customerId: listRentals.rows[i].customerId,
+          gameId: listRentals.rows[i].gameId,
+          rentDate: listRentals.rows[i].rentDate,
+          daysRented: listRentals.rows[i].daysRented,
+          returnDate: listRentals.rows[i].returnDate,
+          originalPrice: listRentals.rows[i].originalPrice,
+          delayFee: listRentals.rows[i].delayFee,
+          customer: {
+            id: listRentals.rows[i].customersID,
+            name: listRentals.rows[i].name,
+          },
+          game: {
+            id: listRentals.rows[i].gameID,
+            name: listRentals.rows[i].gameName,
+            categoryId: listRentals.rows[i].categoryId,
+            categoryName: listRentals.rows[i].categoryName,
+          },
         };
       }
-
       return res.send(listRentals.rows);
     }
   } catch (error) {
